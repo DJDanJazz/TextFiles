@@ -1,0 +1,9 @@
+    ssh://snc@source.americas.nokia.com/tauto/hg/automation_scripts
+svn+ssh://snc@source.americas.nokia.com/tauto/svn/dbclone-ui
+    ssh://snc@source.americas.nokia.com/tauto/hg/environment-web
+    ssh://snc@source.americas.nokia.com/tauto/hg/qc_harness
+    ssh://snc@source.americas.nokia.com/tauto/hg/ta_installer_scripts
+    ssh://snc@source.americas.nokia.com/tauto/hg/ta_portal
+    ssh://snc@source.americas.nokia.com/tauto/hg/vmcloud
+    ssh://snc@source.americas.nokia.com/tauto/hg/XMLAutoCompare
+    

@@ -1,0 +1,93 @@
+SELECT rs.release_id      AS RELEASE_ID_COL_NAME
+,      rs.release_title   AS RELEASE_TITLE_COL_NAME
+,      rs.release_type    AS RELEASE_TYPE_COL_NAME
+,      rs.release_num     AS RELEASE_NUM_COL_NAME
+,      rs.sprint_id       AS SPRINT_ID_COL_NAME
+,      rs.sprint_num      AS SPRINT_NUM_COL_NAME
+,      job.id             AS JOB_ID_COL_NAME
+,      job.name           AS JOB_NAME_COL_NAME
+,      suite.id           AS SUITE_ID_COL_NAME
+,      suite.name         AS SUITE_NAME_COL_NAME
+,      SUM(res.pass) + SUM(res.fail) + SUM(res.blocked) + SUM(res.not_run) AS TOTAL_CASES_COL_NAME
+,      SUM(res.pass)      AS TOTAL_PASSED_COL_NAME
+,      SUM(res.fail)      AS TOTAL_FAILED_COL_NAME
+,      SUM(res.blocked)   AS TOTAL_BLOCKED_COL_NAME
+,      SUM(res.not_run)   AS TOTAL_NOT_RUN_COL_NAME
+,      SUM(res.exec_time) AS TOTAL_EXEC_TIME_COL_NAME
+FROM result res,
+     job,
+     suite,
+     release_sprints_by_project rs
+WHERE job.id          = res.job_id
+  AND rs.project_id   = job.project_id
+  AND suite.job_id    = job.id
+  AND suite.parent_id = -1
+  AND job.project_id  = 39
+  AND rs.team_id      = 6
+  AND rs.release_id   = 889
+  AND rs.sprint_id    = 890
+  AND job.id          = 104 -- "POI Matcher QIL Workflow"
+  AND res.start BETWEEN rs.start_date AND rs.end_date
+GROUP BY rs.release_id, rs.release_title, rs.release_type, rs.release_num, rs.sprint_id, rs.sprint_num, job.id, job.name, suite.id, suite.name
+ORDER BY suite.id;
+
+SELECT suite.id, suite.name, suite.create_dt
+FROM result res,
+     job,
+     suite
+WHERE job.id          = res.job_id
+  AND suite.job_id    = job.id
+  AND suite.parent_id = -1
+  AND job.id = 104 -- "POI Matcher QIL Workflow"
+  AND suite.id IN (603,630,644,658)
+
+SELECT COUNT(*)
+FROM result res,
+     job,
+     suite
+WHERE job.id          = res.job_id
+  AND suite.job_id    = job.id
+  AND suite.parent_id = -1
+  AND job.id = 104 -- "POI Matcher QIL Workflow"
+  AND suite.id IN (603)
+UNION ALL
+SELECT COUNT(*)
+FROM result res,
+     job,
+     suite
+WHERE job.id          = res.job_id
+  AND suite.job_id    = job.id
+  AND suite.parent_id = -1
+  AND job.id = 104 -- "POI Matcher QIL Workflow"
+  AND suite.id IN (630)
+UNION ALL
+SELECT COUNT(*)
+FROM result res,
+     job,
+     suite
+WHERE job.id          = res.job_id
+  AND suite.job_id    = job.id
+  AND suite.parent_id = -1
+  AND job.id = 104 -- "POI Matcher QIL Workflow"
+  AND suite.id IN (644)
+UNION ALL
+SELECT COUNT(*)
+FROM result res,
+     job,
+     suite
+WHERE job.id          = res.job_id
+  AND suite.job_id    = job.id
+  AND suite.parent_id = -1
+  AND job.id = 104 -- "POI Matcher QIL Workflow"
+  AND suite.id IN (658)
+
+SELECT *
+FROM result res,
+     job,
+     suite
+WHERE job.id          = res.job_id
+  AND suite.job_id    = job.id
+  AND suite.parent_id = -1
+  AND job.id = 104 -- "POI Matcher QIL Workflow"
+  AND suite.id IN (658)
+

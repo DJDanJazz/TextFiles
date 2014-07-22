@@ -1,0 +1,58 @@
+#Project: lib - STRATUS / Procedure: STRATUS_CreateVboxInstance
+
+#!/bin/bash -x
+function setInstanceProperty { # We can remove this function.
+	instance=$1
+	name=$2
+	value=$3
+	/tools/stratool/latest/stratool setproperty $instance $name $value
+}
+function getOptTagParameter() {
+  value=$1
+  if [ -z "$value" ]; then
+     echo " userTag $[jobId]"
+  else 
+     echo " userTag $[jobId]$value"
+  fi
+}
+function getOptParameter() {
+  name=$1
+  value=$2
+  if [ -z "$value" ]; then
+     echo ""
+  else 
+     echo " $name $value"
+  fi
+}
+template="$[imageName]"
+owner="$[instanceOwner]"
+numCpus=`getOptParameter --numCpus "$[numCpus]"`
+ramMB=`getOptParameter --ramMB "$[ramMB]"`
+userTag=`getOptTagParameter "$[userTag]"`
+
+if [ -z $owner ]; then
+  owner="$[/projects/lib - Virtualization/Stratus/defaultOwner]"
+fi
+
+####### WARNING: URL ENCODE VALUES, BETTER ERROR CHECKING ########
+cmd=`/tools/stratool/latest/stratool createvbox $template --owner $owner $numCpus $ramMB $userTag`
+result=$?
+ectool setProperty /myParent/name $instanceName
+
+exit $result
+
+
+
+
+
+#build_type		STG											entry
+#major			$[/projects/proj - Stratus/Version/major]	entry
+#minor			$[/projects/proj - Stratus/Version/minor]	entry
+#workflow_name	$[/myWorkflow/workflowName]					entry
+#				$[/projects/lib - Virtualization/Stratus/defaultOwner]
+#imageName	 	(empty)						entry
+#instanceOwner	(empty)						entry
+#numCpus	 	(empty)						entry
+#propertyToSet	/myJob/stratusInstanceName	entry
+#ramMB	 		(empty)						entry
+#userTag	 	(empty)						entry

@@ -1,0 +1,60 @@
+      cloneFile
+      ---------
+ENV   Prod
+CMD1  sudo -u fs09root
+      /home/fs09root/bin/cloneFile
+      '/vbox_vdi/images/vdi/centos64.vdi'
+      '/vbox_vdi/instances/vdi/INST_NAME.vdi'
+CMD2  bash -c '
+         for i in {1..10};
+         do if [ -f\"/vbox_vdi/instances/vdi/INST_NAME.vdi\" ];
+         then break;
+         else sleep 1;
+         fi; done
+      '
+VDI CREATED?   YES
+VM IN STRATUS? YES
+ADDRESSED?     YES
+ERRORS?        NO
+
+
+
+      sbCloneFile
+      ---------
+ENV   Non-Prod
+CMD1  sudo -u fs09root
+      /home/fs09root/bin/sbCloneFile
+      '/sb_vbox_vdi/images/vdi/centos64.vdi'
+      '/sb_vbox_vdi/instances/vdi/INST_NAME.vdi'
+CMD2  bash -c '
+         for i in {1..10};
+         do if [ -f\"/vbox_vdi/instances/vdi/INST_NAME.vdi\" ];      XXX
+         then break;
+         else sleep 1;
+         fi; done
+      '
+VDI CREATED?   YES
+VM IN STRATUS? NO
+ADDRESSED?     NO
+ERRORS         NO
+
+
+
+      sbCloneFile (with Stratus changes)
+      ----------------------------------
+ENV   Non-Prod
+CMD1  sudo -u fs09root
+      /home/fs09root/bin/sbCloneFile
+      '/sb_vbox_vdi/images/vdi/centos64.vdi'
+      '/sb_vbox_vdi/instances/vdi/INST_NAME.vdi'
+CMD2  bash -c '
+         for i in {1..10};
+         do if [ -f\"/sb_vbox_vdi/instances/vdi/INST_NAME.vdi\" ];
+         then break;
+         else sleep 1;
+         fi; done
+      '
+VDI CREATED?   YES
+VM IN STRATUS? YES
+ADDRESSED?     NO
+ERRORS         NO

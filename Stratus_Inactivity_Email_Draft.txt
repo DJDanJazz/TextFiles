@@ -1,0 +1,15 @@
+From: I_EXT_TESTAUTOMATION_GMS DG
+Sent: <date>
+To: <user_email>
+Subject: Automated Message from Stratus: inactive vm "<vm_name>"
+
+Hello <user_name>,
+
+VM "<vm_name>" is scheduled for shutdown in 2 days and subsequent removal in 7 days due to inactivity.
+If you wish to keep this instance, sign into Stratus with your Windows credentials.
+This will prevent all your instances from being shutdown or removed for another 7 days.
+You wont receive this email again unless any of your instances become inactive for 7 days.
+________________________________________
+Please note that the responsibility to remove unused instance is yours,
+and you should not rely on the automated system to clean them up.
+This is the last email message that you will be getting for this specific instance.

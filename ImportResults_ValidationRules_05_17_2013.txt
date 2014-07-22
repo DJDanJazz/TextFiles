@@ -1,0 +1,29 @@
+----------------------------
+--- New Validation Rules ---
+----------------------------
+- Check if the uploaded file is a .xls or .xlsx document.
+- Submit ALL or NO worksheets.
+- Use separate RunIDs for each worksheets.
+- Create a web service to delete test cases/suites/results by RunID(s)
+- Determine data structure(s) for encapsulating Workbook/Spreadsheet data.
+- Verify all worksheets before importing data.
+- Verify first, import second.
+- Verify names of headers - Test Case Name, Test Case Status.
+- Verify test status is one of: 'pass', 'fail', 'blocked', '' (not run), 'p', 'f', 'b'.
+- Verify duplicate suites and test cases.
+- Find a way to get the count of all rows in a worksheet.
+   - org.apache.poi.ss.usermodel.Sheet::getPhysicalNumberOfRows(): int
+- Create one report of all validation errors which exist within a workbook.
+   - Report this to the user.
+
+---------------------------------
+--- Existing Validation Rules ---
+---------------------------------
+// Inside: class ExcelParser
+- Check if workbook is null.  This is an error.
+- For each sheet, check if the zeroth row is null.  This is an error.
+- For each sheet, check for duplicated headers (-1 != nameIndex).  This is an error.
+- For each sheet, check for missing headers (-1 == nameIndex).  This is an error.
+- For each sheet, check for non-empty cells before the test case cell.  This is an error.
+- For each sheet, check for status value not in "PASS", "FAIL", "BLOCKED", "".  This is an error.
+- For each sheet, check for duplicate test cases.

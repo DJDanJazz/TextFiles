@@ -1,0 +1,5 @@
+DB Cloning creds
+
+tchirdcdev01
+user rdreplt
+try "sudo -u rdreplt -i", although we may need to add you to a group

@@ -1,0 +1,164 @@
+--Submitted to Service
+15:43:36,731 INFO  [Submitter:71]
+{
+   "longname":"Liebe~JVC Process~Build deploy",
+   "jobname":"AR Pipeline",
+   "teamname":"DCA",
+   "casename":"Build deploy",
+   "projectname":"STG",
+   "separator":"~"
+}
+15:43:36,749 INFO  [Submitter:96]
+{
+   "stop":"2013-05-28 00:00:00.0",
+   "jobname":"AR Pipeline",
+   "longname":"Liebe~JVC Process~Build deploy",
+   "exectime":0,
+   "projectname":"STG",
+   "runid":"1369755814228",
+   "pass":"0",
+   "fail":"0",
+   "start":"2013-05-28 00:00:00.0",
+   "teamname":"DCA",
+   "casename":"Build deploy",
+   "blocked":"0",
+   "separator":"~",
+   "notRun":"0"
+}
+
+
+
+-- Inside Service
+
+--TeamData teamData = teamSimpleDAO.getTeam(new TeamData(-1, teamName, "")); // teamName => DCA
+/*Prepared Statement*/ SELECT id, name, description FROM team WHERE id=? or name=?
+/*Actual Statement*/   SELECT id, name, description FROM team WHERE id=-1 or name='DCA'
+-->Returns: id name description
+-->         6  DCA  
+
+--ProjectData projectData = projectSimpleDAO.getProject(new ProjectData(-1, projectName, "", teamId)); => STG
+/*Prepared Statement*/ SELECT id, name, description, team_id FROM project WHERE team_id=? and (id=? or name=?)
+/*Actual Statement*/   SELECT id, name, description, team_id FROM project WHERE team_id=6 and (id=-1 or name='STG')
+-->Returns: id name description team_id
+-->         39 STG              6
+
+--JobData jobData = jobSimpleDAO.getJob(new JobData(-1, jobName, projectId));
+/*Prepared Statement*/
+select j.project_id, j.id, j.name, j.create_dt, s.suite_count, c.case_count
+from job j left outer join
+   (
+    select job_id, count(distinct s.id) suite_count
+    from suite s join test_case tc
+    on s.id=tc.suite_id
+    group by s.job_id
+   ) s
+   on j.id=s.job_id left outer join
+   (
+    select job_id, count(tc.id) case_count
+    from suite s join test_case tc
+    on s.id=tc.suite_id
+    group by s.job_id
+   ) c on j.id=c.job_id
+where (j.id=? or j.name=?)
+  and project_id=?;
+/*Actual Statement*/
+select j.project_id, j.id, j.name, j.create_dt, s.suite_count, c.case_count
+from job j left outer join
+   (
+    select job_id, count(distinct s.id) suite_count
+    from suite s join test_case tc
+    on s.id=tc.suite_id
+    group by s.job_id
+   ) s
+   on j.id=s.job_id left outer join
+   (
+    select job_id, count(tc.id) case_count
+    from suite s join test_case tc
+    on s.id=tc.suite_id
+    group by s.job_id
+   ) c on j.id=c.job_id
+where (j.id=-1 or j.name='AR Pipeline')
+  and project_id=39;
+-->Returns: project_id id   name        create_dt               suite_count case_count
+-->         39         108  AR Pipeline 2013-05-28 15:43:34.243 1           2
+
+--suiteId = suiteSimpleDAO.getParentId(longName, jobId, projectId, separator); => Liebe~JVC Process~Build deploy, 108, 39, ~
+--suiteData = getSuiteByProjectJobParent(new SuiteData("", suiteNames[i], parentId, jobId, ""), projectId);
+--suiteData.getJobId(), suiteData.getJobName(), suiteData.getSuiteId(), suiteData.getSuiteName(), suiteData.getParentId()
+/*Prepared Statement*/
+SELECT s.id, s.name, parent_id, job_id, j.name job_name
+FROM suite s join job j on s.job_id=j.id
+WHERE ( j.id=? or j.name=?)
+  AND ( s.id=? OR s.name=?)
+  AND parent_id=?
+/*Actual Statement*/
+SELECT s.id, s.name, parent_id, job_id, j.name job_name
+FROM suite s join job j on s.job_id=j.id
+WHERE ( j.id=108 or j.name='')
+  AND ( s.id='' OR s.name='Liebe')
+  AND parent_id=-1
+-->Returns: id  name  parent_id job_id job_name
+-->         744 Liebe -1        108    AR Pipeline
+SELECT s.id, s.name, parent_id, job_id, j.name job_name
+FROM suite s join job j on s.job_id=j.id
+WHERE ( j.id=108 or j.name='')
+  AND ( s.id='' OR s.name='JVC Process')
+  AND parent_id=744
+-->Returns: id  name        parent_id job_id job_name
+-->         745 JVC Process 744       108    AR Pipeline
+SELECT s.id, s.name, parent_id, job_id, j.name job_name
+FROM suite s join job j on s.job_id=j.id
+WHERE ( j.id=108 OR j.name='')
+  AND ( s.id='' OR s.name='Build deploy')
+  AND parent_id=745
+-->Returns: id  name        parent_id job_id job_name
+-->         
+
+--CaseData caseData = caseSimpleDAO.getCaseByName(caseName, suiteId);
+/*Prepared Statement*/
+SELECT c.id, c.name, suite_id, s.name suite_name , j.id job_id , j.name job_name , '' as  last_date , '0' as  exec_time , '0' as  pass , '0'as fail
+FROM test_case c join suite s on c.suite_id=s.id join job j on s.job_id=j.id
+WHERE c.name=? and suite_id=?
+/*Actual Statement*/
+SELECT c.id, c.name, suite_id, s.name suite_name , j.id job_id , j.name job_name , '' as  last_date , '0' as  exec_time , '0' as  pass , '0'as fail
+FROM test_case c join suite s on c.suite_id=s.id join job j on s.job_id=j.id
+WHERE c.name='Build deploy' and suite_id=745
+-->Returns: id   name         suite_id suite_name  job_id job_name    last_date exec_time pass fail
+-->         1882 Build deploy 745      JVC Process 108    AR Pipeline           0         0    0
+
+--ResultData resultData = new ResultData(resultId, jobId, suiteId, caseId, pass, fail, blocked,
+--                                       notRun, execTime, failRate, start, stop, projectId, runId, buildId);
+--resultSimpleDAO.insertResult(resultData);
+/*
+getSimpleJdbcTemplate().update(INSERT_RESULT,
+   rId, jId, resultData.getSuiteId(), cId, resultData.getPass(), resultData.getFail(),
+   resultData.getBlocked(), resultData.getNotRun(), resultData.getExecTime(),
+   start, stop, resultData.getRunId(), resultData.getBuildId());
+*/
+/*Prepared Statement*/
+INSERT INTO
+result ( id
+,        job_id
+,        suite_id
+,        case_id
+,        pass
+,        fail
+,        blocked
+,        not_run
+,        exec_time
+,        start
+,        stop
+,        run_id
+,        build_id
+) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+
+
+
+-- Agile Report
+teamId      = 6
+projectId   = 39
+releaseId   = 891
+sprintId    = 893
+componentId = 108 
+
+

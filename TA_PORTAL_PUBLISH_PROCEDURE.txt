@@ -1,0 +1,55 @@
+TA PORTAL
+   PUBLISH PROCEDURE
+
+
+Notes:
+   A backup of the DDL statements to create DB objects in Portal
+   are stoared in: \\iislnfsa\tauto\User\Dan\TAPortal\Backup\NewPortalTables.sql
+
+
+
+Database:
+      Take a snapshot of production database.
+      Open pgAdmin III.
+      Open DB: eexwktst-TCHISITDB02-reports.
+      Expand schema 'reports'.
+      Open new SQL editor.
+      Run DDL statements from NewPortalTables.sql, in PGAdmin III.
+
+
+
+WAR:
+      SSH into: taportal
+      Using your UNIX account.
+
+      Move File: ReportService.war
+            To: /tautoappslv/tomcat/7.0.27/webapps/
+
+      Move Files: All other wars
+            To: /tautoappslv/liferay-portal-6.1.0-ce-b4/deploy/
+
+
+
+Smoke test TA portal (production) to make sure there are no errors.
+
+
+
+Display the Agile Report:
+      Open a browser to http://taportal:9080/
+      Sign in:
+            test@liferay.com
+            test1
+      Create a new page for the Agile Report.
+      Install the Agile Report portlet to the new page.
+
+Verify TA Portal production functionality.
+
+Create a tag for 01.03 for taportal in SVN.
+   Navigate to the ta_portal 'trunk' folder in Windows Explorer.
+   Right-click on the ta portal trunk and select the ‘Branch/Tag' option from the TortoiseSVN menu.
+   In the subsequent dialog, change the value of 'To path:' to 01.03.
+   Add a log message in the 'Log message' field.
+   Click 'Ok'.
+
+Update taportal/trunk/pom.xml version from 01.03-SNAPSHOT to 01.04-SNAPSHOT (child-modules do not need to have their pom files updates.)
+Commit the pom to SVN.

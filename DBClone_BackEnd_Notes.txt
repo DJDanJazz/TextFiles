@@ -1,0 +1,80 @@
+Part 1
+
+DB Cloning allows a developer or tester to clone an entire existing source or master database to a destination clone.
+New database clone is an exact copy.
+The cloning operation takes about 15 minutes to clone an entire continental database.
+Each team has exclusive access to their clone.
+Databases are stored in separate set of filesystems located on NetApp filers.
+Destination instances may be created on physical servers or VMs.
+Physical servers may host multiple instances.
+There are a total of 79 clone instances hosted on 8 physical servers and 33 VMs.
+DB Instance is a set of processes running on a server.
+Snap Manager for Oracle is a NetApp product which allows DBAs to manage clones of Oracle databases.
+Unused backups are auto-purged based on retention policy.
+Any *nix server with access to /tools can be used to query the DBClone back-end.
+E.g.:
+$ showCloneInstances -t test
+.dbf files are database files.
+
+Part 2
+
+SMO - Snap Manager for Oracle
+SMO uses NetApp client packages, snapdrive, etc.
+SMO issues Snapdrive commands, OS commands, and Oracle commands.
+SMO runs pre and post cloning scripts to customize db clones.
+SMO requires data files, redo logs, control files, etc.
+E.g.: /oradata_{SID}/db...
+SMO server is running on each host which requires DB cloning.
+
+FlexClone uses Netapp to clone file systems.
+
+Source vs. Master instances
+NetApp filers
+lnapfs09-smo.lnapfs10-smo
+
+Clone locations
+tchidb01 - tchidb43
+...
+
+FlexVol's and FlexClones
+Source FlexVol.
+Volume has 5 blocks.
+When a snapshot is created, it uses pointers to the original blocks.
+When changes are made, it creates additional blocks which are A (orig) a' (new) for example.
+
+For backup commands, the SMO server process on the source server:
+- Saves the current state of the instance and makes copies of the control files.
+- If the instance is running in archivelog mode, it either alters the state to backup mode or shuts down the instance, depending on how SMO was called.
+- If the instance is not in archivelog mode, it has to be shut down to back it up.
+- Calls snapdrive to take a snapshot of the file systems.
+- ?
+
+Part 3
+
+NetApp
+Disc Management
+
+Part 4
+
+Provisioning
+
+Envs:
+	DEV
+	TEST
+	PREPROD
+	PROD
+
+Env Vars:
+	Directories and files
+	Oracle user names and connection strings,
+	SMO,
+	etc.
+
+Sample SMO command:
+clone create -profile ... -backup-label ... -newsid ... -label ... -clonespec ... -taskspec ... -reserve ... -host ... -comment ... -verborse
+
+Glue scripts
+
+Start with user documentation
+
+

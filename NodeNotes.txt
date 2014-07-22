@@ -1,0 +1,88 @@
++-----------------------------------------------------+
+| Notes for installing and using Node.js with Express |
++-----------------------------------------------------+
+
+Installed node.js from http://nodejs.org/
+CMD: mkdir NodeLab
+CMD: cd NodeLab
+CMD: npm install -g express
+CMD: npm install -g express-generator
+CMD: npm install -g bower			# For browser libraries
+CMD: express -c stylus node-lab		# -c for stylus CSS preprocessing
+CMD: cd node-lab
+CMD: npm install					# This installs dependencies
+CMD: mkdir data
+CMD: npm start						# node will start listening on port 3000
+WEBBR: http://localhost:3000/
+ECLIPSE: install Nodeclipse and Express
+ECLIPSE: New -> Project -> (Select) Node -> (Select) Node Application -> Browse to NodeLab -> (Click) Finished
+ECLIPSE: # This will create a NodeLab eclipse project, preloaded with all your node document files.
+ECLIPSE: Window -> Preferences -> (Select) Nodeclipse -> (Enter) Node Path
+ECLIPSE: This should be: C:\Users\<USERNAME>\nodeJS\node.exe
+ECLIPSE: To launch your Node app: (Right-Click) node-lab\app.js -> (Select) Run-As -> (Select) Node Application
+ECLIPSE: If you want to start Node, then launch a browser to the app automatically,
+         Create a batch script in your project root (NodeLab) and include the following:
+taskkill /F /IM node.exe
+cd node-lab
+start npm start
+start "NodeLab" "http://localhost:3000/"
+
++-------------+
+| Alternative |
++-------------+
+
+CMD: express NodeLab
+CMD: cd NodeLab
+CMD: npm install					# This installs dependencies
+ECLIPSE: New -> Project -> (Select) Node -> (Select) Node Application -> Browse to NodeLab -> (Click) Finished
+ECLIPSE: # This will create a NodeLab eclipse project, preloaded with all your node document files.
+ECLIPSE: If you want to start Node, then launch a browser to the app automatically,
+         Create a batch script in your project root (NodeLab) and include the following:
+taskkill /F /IM node.exe
+start npm start
+start "NodeLab" "http://localhost:3000/"
+
++-----------------------------------------+
+| User Bower to install browser libraries |
++-----------------------------------------+
+
+bower install dojo=http://download.dojotoolkit.org/release-1.9.3/dojo-release-1.9.3-src.tar.gz
+EDIT app.js: app.use(express.static(path.join(__dirname, 'bower_components')));		# This serves all the installed bower components
+EDIT app.js: app.use(express.static(path.join(__dirname, 'bower_components', 'dojo')));		# This serves just the dojo bower component
+
++----------------------------------------+
+| Notes for installing and using MongoDB |
++----------------------------------------+
+
+Downloaded zip file from mongodb.org/downloads
+Unzip zip file
+CMD: npm install -g mongojs		# Node API for MongoDB
+CMD: npm install -g mongodb		# Node-MongoDB driver
+CMD: npm install -g mongoose	# ORM
+CMD: mongod --dbpath data		# This starts MongoDB where 'data' is the working directory for data persistence
+CMD: mongo						# Connects to MongoDB for transactions
+CMD: use DBNAME					# Where DBNAME is the name of the database.  It will be created if it doesn't already exist.
+CMD: show dbs					# Show all databases.
+CMD: show collections			# Show all collections in the current database.
+CMD: db.COLLECTION.insert(JSON)	# Where COLLECTION is the name of a collection.  It will be created if it doesn't already exist.  JSON is a JSON object.
+CMD: db.COLLECTION.find()		# Queries the entire database.
+CMD: db.COLLECTION.find({x: {$gt: 10}})						# Queries the database with a condition (x > 10)
+CMD: db.COLLECTION.find({x: {$in: [1,3,5,7]}})				# Queries the database with a condition (x is either 1, 3, 5, or 7)
+CMD: db.COLLECTION.update({x: 5}, {$set: {y: 'abc123'}})	# Updates/adds field y, to records in which x is 5.
+CMD: db.COLLECTION.remove({})			# Deletes all records from the collection.
+CMD: db.COLLECTION.remove({x : "3"})	# Deletes records from the collection where x is 3.
+
++-------------------------------------+
+| Notes for writing tests for Node.js |
++-------------------------------------+
+
+TestRunners: Mocha/Nodeunit/Node-Tap/Vows
+AssertionLibraries: ChaiJS/ShouldJS
+
+CMD: npm install chai		# Do not install test libraries globally.  They need to be referenced from the project iteself.
+CMD: npm install should		# Do not install test libraries globally.  They need to be referenced from the project iteself.
+CMD: npm install mocha		# Do not install test libraries globally.  They need to be referenced from the project iteself.
+CMD: npm install request	# Do not install test libraries globally.  They need to be referenced from the project iteself.
+ECLIPSE: If you want to test Node automatically,
+         Create a batch script in your project root (NodeLab) and include the following:
+start mocha tests --recursive

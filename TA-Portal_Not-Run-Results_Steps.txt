@@ -1,0 +1,138 @@
+Itinerary for Allowing 'Not Run' results for TA Portal results.
+
+I.    Update PostgreSQL
+      A.    Alter 'result' table
+            i.    New Column
+                  not_run integer NOT NULL DEFAULT (0)::integer,
+            ii.   TTD
+                  5 min
+      B:    Alter 'release_sprints_by_job' view
+            i.    New Select Clause
+                  nvl((((
+                     SELECT sum(res.not_run) AS sum
+                     FROM result res
+                     WHERE job.id = res.job_id
+                       AND res.start >= rs.start_date
+                       AND res.start <= rs.end_date
+                  )))::numeric, (0)::numeric) AS total_not_run
+            ii.   TTD
+                  6 min
+II.   Update ReportService
+      A.    Update Model Class: ReleaseAndSprintResultData
+            i.    New Class Field
+	               public static final String TOTAL_NOT_RUN_COL_NAME = "total_not_run";
+            ii.   New Field
+                  private Integer totalNotRun;
+            iii.  New Methods
+                  Getter and Setter for totalNotRun
+            iv.   Update Constructor
+                  setTotalNotRun(-1);
+            v.    Update Method: toJSON()
+                  jsonobj.put(TOTAL_NOT_RUN_COL_NAME, this.totalNotRun);
+            vi.   Update Method: fromJSON(JSONObject json)
+                  if(json.has(TOTAL_NOT_RUN_COL_NAME)) setTotalNotRun(json.getInt(TOTAL_NOT_RUN_COL_NAME));
+            vii.  Update MEthod: toString()
+                  sb.append(",");
+                  sb.append(String.format(keyValFmt, TOTAL_NOT_RUN_COL_NAME, this.totalNotRun));
+            viii. TTD
+                  15 min
+      B.    Update Model Class: ReleaseAndSprintResultParameterizedRowMapper
+            i.    Update Method: ReleaseAndSprintResultData mapRow(ResultSet rs, int rowNum)
+                  releaseAndSprintResult.setTotalNotRun(rs.getInt(ReleaseAndSprintResultData.TOTAL_NOT_RUN_COL_NAME));
+            ii.   TTD
+                  5 min
+      C.    Update Model Class: ResultData
+            i.    New Field
+                  private Integer notRun;
+            ii.   Update Constructor
+                  Add parameter: Integer notRun
+                  this.notRun = notRun;
+            iii.  New Methods
+                  Getter and Setter for notRun
+            iv.   Update Method: toJSON()
+                  jsonobj.put("notRun", this.notRun);
+            v.    Update Method: toSummaryJSON()
+                  jsonobj.put("notRun", (this.notRun));
+            vi.   Update Method: toString()
+                  .append(",notRun:")
+                  .append(this.notRun)
+            vii.  TTD
+                  15 min
+      E.    Update Model Class: ResultParameterizedRowMapper
+            i.    Update Method: mapRow(ResultSet rs, int rowNum)
+                  resultData.setNotRun(rs.getInt("NOT_RUN"));
+            ii.   TTD
+                  5 min
+      F.    Update Model Class: ResultStatsData
+            i.    New Field
+                  private int totalNotRun;
+            ii.   Update Constructor
+                  Add parameter: int totalNotRun
+                  this.totalNotRun = totalNotRun;
+            iii.  New Methods
+                  Getter and Setter for totalNotRun
+            iv.   Update Method: toJSON()
+                  jsonobj.put("totalNotRun", this.totalNotRun);
+            v.    TTD
+                  15 min
+      G.    Update Model Class: ResultStatsParameterizedRowMapper
+            i.    Update Method: mapRow(ResultSet rs, int rowNum)
+                  resultData.setNotRun(rs.getInt("TOTAL_NOT_RUN"));
+            ii.   TTD
+                  5 min
+      H.    Update Model Class: ResultSummaryParameterizedRowMapper
+            i.    Update Method: mapRow(ResultSet rs, int rowNum)
+                  resultData.setNotRun(rs.getInt("NOT_RUN"));
+            ii.   TTD
+                  5 min
+      I.    Update Resource Class: ResultServerResource
+            i.    Update Method: store(JsonRepresentation)
+                  int notRun = 0;
+                  ---
+                  if(null != json.opt("notRun")){
+						   notRun = Integer.parseInt(json.get("notRun").toString());
+					   }
+                  ---
+                  ResultData resultData = new ResultData(resultId, jobId, suiteId, caseId, pass, ...);
+                  Add parameter: notRun
+            ii.   TTD
+                  5 min
+      J.    Update Class: ExcelParser
+            i.    Update Method: endTest(String team, String project, String name, String longname, ...)
+                  String notRun = status.equalsIgnoreCase("NOT_RUN" ? "1" : "0");
+                  String data = "{casename:'" + name + "',jobname:'" + job ...
+                  Add "',notRun:'" + notRun
+            ii.   TTD
+                  5 min
+III.  Update Detail Report
+      A.    No change required.
+IV.   Update Agile Report
+      A.    Update File: Charts.js
+            i.    Update Function: defineCharts(defaultChartTitle, defaultXAxisTitle, ...)
+                  Add series 'Not Run Tests'
+            ii.   Update Function: updateCharts(chartTitle, xAxisTitle, ...)
+                  Update series 'Not Run Tests'
+            iii.  Update Function: updateChartsAndSelectRoot(chartTitle, teamId, projectId)
+                  Add line: getDataFromSeriesSvc(teamId, projectId, "", "", "", "not_run"),
+            iv.   TTD
+                  9 min
+      B.    Update File: Tree.js
+            i.    Update Event Listener: onClick: function(item, node, event)
+                  Add line: getDataFromSeriesSvc(teamId, projectId, releaseId, sprintId, componentId, "not_run"),
+            ii.   TTD
+                  5 min
+      C.    Update File: View.jsp
+            i.    Update main JavaScript routine
+                  Add line: getDataFromSeriesSvc(defaultTeamId, defaultProjectId, "", "", "", "not_run")
+            ii.   TTD
+                  5 min
+V.    Update TA-Listener
+      A.    No change required.
+VI.   Update Robot MVN Plugin
+      A.    Update Class: JunitListener.java
+            i.    Add ,not_run:'0'
+            ii.   TTD
+                  5 min
+
+Total TTD.  125 min
+            2 hours 5 min

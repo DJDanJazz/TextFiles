@@ -1,0 +1,47 @@
++-------------------------------------------------+
+| Notes for DAD-546 - Create Node/Express Project |
++-------------------------------------------------+
+
+CMD: express --ejs da-portal-rest
+CMD: npm install -save bower
+CMD: npm install -save grunt
+CMD: npm install -save grunt-cli
+CMD: npm install -save grunt-run
+CMD: npm install -save grunt-open
+CMD: npm install -save grunt-shell
+CMD: npm install -save grunt-connect
+CMD: npm install -save grunt-express
+CMD: npm install -save grunt-express-server
+CMD: npm install -save grunt-mocha-test
+CMD: npm install -save mocha
+CMD: npm install -save should
+CMD: npm install -save request
+CMD: npm install -save unirest
+CMD: npm install -save supertest
+CMD: npm install -save superagent
+CMD: mkdir tests
+CMD: npm install
+CMD: touch run.bat
+EDIT: run.bat
+	taskkill /F /IM node.exe
+	start npm start
+	start "DAPortalREST" "http://localhost:3000/"
+ECLIPSE: New -> Project -> (Select) Node -> (Select) Node Express Application -> Browse to DAPortalREST -> (Click) Finished
+
++-------------+
+| Using Grunt |
++-------------+
+
+CMD: grunt.cmd --gruntfile grunt.js
+CMD: grunt.cmd --gruntfile grunt.js TASK
+
++-----------+
+| Mercurial |
++-----------+
+
+hg init
+hg add
+hg commit -m "Initialized Repository"
+hg push ssh://snc@source-americas.it.here.com/da-portal/hg/da-portal-rest
+
+

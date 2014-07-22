@@ -1,0 +1,59 @@
+- Reading previous list.
+- Detection pass.
+STRATUS-685476-11059259 - completed_error - remove
+STRATUS-688672-11086064 - completed_abort - remove
+STRATUS-704641-11313163 - completed_error - remove
+STRATUS-708609-11366678 - completed_success - remove
+STRATUS-708633-11367062 - completed_success - remove
+STRATUS-708651-11367266 - completed_success - remove
+STRATUS-709022-11371839 - completed_success - remove
+STRATUS-709051-11372317 - completed_success - remove
+STRATUS-709069-11372529 - completed_success - remove
+STRATUS-709814-11383105 - completed_abort - remove
+STRATUS-709861-11383842 - completed_abort - remove
+- Removal Pass.
+Removing STRATUS-685476-11059259
+Removing STRATUS-688672-11086064
+STRATUS-703943-11299867 already gone
+STRATUS-703970-11300476 already gone
+STRATUS-703989-11300720 already gone
+STRATUS-704132-11302115 already gone
+STRATUS-704152-11302333 already gone
+STRATUS-704178-11302532 already gone
+STRATUS-704353-11305605 already gone
+STRATUS-704374-11305932 already gone
+STRATUS-704392-11306334 already gone
+Removing STRATUS-704641-11313163
+Removing STRATUS-708609-11366678
+Removing STRATUS-708633-11367062
+Removing STRATUS-708651-11367266
+Removing STRATUS-709022-11371839
+Removing STRATUS-709051-11372317
+Removing STRATUS-709069-11372529
+Removing STRATUS-709814-11383105
+Removing STRATUS-709861-11383842
+
+expander boxRemove STRATUS-685476-11059259 Aborted 00:00:10.825
+   ruviva
+   Instance ruviva stop failed.
+   GET http://stratus:8080/rest/instance/operate?operation=stop&owner=jschrant&instance=ruviva&clientRequestor=stratool
+   returned a response status of 500 Internal Server Error Error: Internal error: Factory could not find an operation the current VM state
+   + out=
+   + ret=255
+   + echo Output:
+expander boxRemove STRATUS-688672-11086064 Aborted 00:00:10.599
+   mevopo
+   Instance mevopo stop failed.
+   GET http://stratus:8080/rest/instance/operate?operation=stop&owner=jschrant&instance=mevopo&clientRequestor=stratool
+   returned a response status of 500 Internal Server Error Error: Internal error: Factory could not find an operation the current VM state
+   + out=
+   + ret=255
+   + echo Output:
+expander boxRemove STRATUS-704641-11313163 Aborted 00:00:10.644
+   qusayu
+   Instance qusayu stop failed.
+   GET http://stratus:8080/rest/instance/operate?operation=stop&owner=jschrant&instance=qusayu&clientRequestor=stratool
+   returned a response status of 500 Internal Server Error Error: Internal error: Factory could not find an operation the current VM state
+   + out=
+   + ret=255
+   + echo Output:

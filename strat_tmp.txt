@@ -1,0 +1,3 @@
+imdisk -a -s 500M -m r: -p "/fs:ntfs /q /y"
+\\iislnfsa\ec_store\workspace\job_201405271209_J3699199
+R:\demo_scripts

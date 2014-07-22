@@ -1,0 +1,17 @@
+tchitavmhost01
+   inapfs13:/vol/sb_vbox_vdi/nfs
+                      73400320  36723488  36676832  51% /sb_vbox_vdi
+   inapfs14:/vol/vbox_vdi
+                     503316480 365129216 138187264  73% /vbox_vdi
+tchitavmhost02
+   inapfs13:/vol/sb_vbox_vdi/nfs
+                      73400320  36723744  36676576  51% /sb_vbox_vdi
+   inapfs14:/vol/vbox_vdi
+                     503316480 365130784 138185696  73% /vbox_vdi
+
+tchitavmhost04
+   inapfs13:/vol/sb_vbox_vdi/nfs
+                      73400320  36723456  36676864  51% /vbox_vdi
+tchitavmhost05
+   inapfs13:/vol/sb_vbox_vdi/nfs
+                      73400320  36723296  36677024  51% /vbox_vdi

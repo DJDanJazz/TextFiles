@@ -1,0 +1,63 @@
+ATOM_TYPE START
+0 = WHITE_FLOOR
+1 = BLACK_FLOOR
+2 = STONE_WALL
+3 = BRICK_WALL
+4 = WATER
+5 = LAVA
+ATOM_TYPE END
+
+ITEMS START
+0 = SILVER_KEY
+1 = GOLD_KEY
+ITEMS END
+
+MAP_ENV START
+2 2 2 2 2
+2 0 1 0 2
+2 1 4 1 2 2 2
+2 0 1 0 1 0 2
+2 2 2 1 5 1 2
+    2 0 1 0 2
+	2 2 2 2 2
+MAP_ENV END
+
+MAP_ITEMS START
+4,3 = 0
+3,4 = 1
+MAP_ITEMS END
+
+
+
+
+
+{
+MAP: {
+	ATOM_TYPE: [
+		{key: 0, val: 'WHITE_FLOOR'},
+		{key: 1, val: 'BLACK_FLOOR'},
+		{key: 2, val: 'STONE_WALL'},
+		{key: 4, val: 'WATER'},
+		{key: 5, val: 'LAVA'}
+	],
+	ITEMS: [
+		{key: 0, val: 'SILVER_KEY'},
+		{key: 1, val: 'GOLD_KEY'}
+	],
+	MAP_ITEMS: [
+		{x: 4, y: 3, item: 0},
+		{x: 3, y: 4, item: 1}
+	]
+}
+}
+
+
+
+-Separate File-
+2 2 2 2 2
+2 0 1 0 2
+2 1 4 1 2 2 2
+2 0 1 0 1 0 2
+2 2 2 1 5 1 2
+    2 0 1 0 2
+	2 2 2 2 2

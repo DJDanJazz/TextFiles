@@ -1,0 +1,15 @@
+ElectricCommander_Stratus_Updates
+---------------------------------
+
+Library
+-------
+lib - STRATUS <==> https://commander.hq.navteq.com/commander/link/projectDetails/projects/lib%20-%20STRATUS?s=Projects
+
+Procedure
+---------
+STRATUS_CreateVboxInstance <==> https://commander.hq.navteq.com/commander/link/procedureDetails/projects/lib%20-%20STRATUS/procedures/STRATUS_CreateVboxInstance?objectId=procedure-728&filterName0=procedurePageSearchlib+-+STRATUS&filterDepth=1
+
+Step
+----
+Original (create) <==> https://commander.hq.navteq.com/commander/link/editStep/projects/lib%20-%20STRATUS/procedures/STRATUS_CreateVboxInstance/steps/create?redirectTo=%2Fcommander%2Flink%2FprocedureDetails%2Fprojects%2Flib%2520-%2520STRATUS%2Fprocedures%2FSTRATUS_CreateVboxInstance%3FobjectId%3Dprocedure-728%26filterName0%3DprocedurePageSearchlib%2B-%2BSTRATUS%26filterDepth%3D1
+Copy (createCLI) <==> https://commander.hq.navteq.com/commander/link/editStep/projects/lib%20-%20STRATUS/procedures/STRATUS_CreateVboxInstance/steps/createCLI?redirectTo=%2Fcommander%2Flink%2FprocedureDetails%2Fprojects%2Flib%2520-%2520STRATUS%2Fprocedures%2FSTRATUS_CreateVboxInstance%3Fs%3DProjects

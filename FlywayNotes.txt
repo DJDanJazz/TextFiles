@@ -1,0 +1,19 @@
++------------------+
+| Flyway PoC Notes |
++------------------+
+
+WEB: Downloaded Flyway: http://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/3.0/flyway-commandline-3.0.zip
+ZIP: Extracted Flyway locally.
+Copy the flyway install dir to a work dir (<PROJECT>)
+COPY/DOWNLOAD: Oracle JDBC Jar to: <PROJECT>/jars/ojdbc-14.jar
+EDIT: <PROJECT>/conf/flyway.properties
+	ADD LINES:
+flyway.driver=oracle.jdbc.driver.OracleDriver
+flyway.url=jdbc:oracle:thin:@tchirdcdb07:1521:CLN0705T
+flyway.user=DCA
+flyway.password=password
+
+CMD: flyway migrate
+	To invoke scripts
+CMD: flyway clean
+	To start over

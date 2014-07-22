@@ -1,0 +1,217 @@
+from __future__ import print_function
+
+import datetime
+from operator import itemgetter
+import logging
+import sys
+
+import ec
+
+logger = logging.getLogger(__name__)
+
+# Partition function as seen on http://stackoverflow.com/questions/4578590/python-equivalent-of-filter-getting-two-output-lists-i-e-partition-of-a-list
+def partition(pred, iterable):
+    'Use a predicate to partition entries into false entries and true entries'
+    # partition(is_odd, range(10)) --> 0 2 4 6 8   and  1 3 5 7 9
+    trues = []
+    falses = []
+    for item in iterable:
+        if pred(item):
+            trues.append(item)
+        else:
+            falses.append(item)
+    return trues, falses
+
+def get_property_value(cmdr, property, expand=True):
+    response = cmdr.getProperty({ 'propertyName': property, 'expand': expand }, discover_jobstep_id=True)
+    return response['property']['value']
+
+def dump_resource_list(resources):
+    for resource in resources:
+        logger.info('\t{}\tsalt_configs_version: {}\tcreateTime: {}\tage: {}'.format(resource['resourceName'], resource['salt_configs_version'], resource['createTime'], resource['age']))
+
+def get_resources_in_pool(cmdr, pool):
+    """ Gets a sorted list of resources from the provided pool. """
+    logger.info('Finding resources in {}...'.format(pool))
+
+    response = cmdr.getResourcesInPool({'pool': pool})
+    if 'resource' in response:
+        resources = response['resource']
+    else:
+        resources = []
+
+    # Cache the age of the resources and the version of salt configs they are using.
+    now = datetime.datetime.utcnow()        
+    for resource in resources:
+        resource['age'] = now - datetime.datetime.strptime(resource['createTime'], '%Y-%m-%dT%H:%M:%S.%fZ')
+        resource['salt_configs_version'] = get_property_value(cmdr, '/resources/{}/salt_configs_version'.format(resource['resourceName']))
+        
+    logger.info('{} resource(s) found{}'.format(len(resources), ':' if resources else '.'))
+
+    # Sort the resources, youngest first
+    resources = sorted(resources, key=itemgetter('age'))
+    
+    dump_resource_list(resources)
+    
+    return resources
+
+def determine_resources_to_remove(resources, salt_configs_version, resource_lifetime, pool_size):
+    logger.info('Determining which resources should be removed...')
+    
+    logger.info('Checking for resources with salt_configs_version != {}...'.format(salt_configs_version))
+    incorrect_salt_configs_version_resources, remaining_resources = partition(lambda r: r['salt_configs_version'] != salt_configs_version, resources)
+    
+    logger.info('{} resource(s) with salt_configs_version != {}{}'.format(len(incorrect_salt_configs_version_resources), salt_configs_version, 
+                                                                          ':' if incorrect_salt_configs_version_resources else '.'))
+    dump_resource_list(incorrect_salt_configs_version_resources)
+
+    logger.info('Checking for resources older than {} hours...'.format(resource_lifetime))
+    resource_lifetime_timedelta = datetime.timedelta(hours=resource_lifetime)
+    old_resources, remaining_resources = partition(lambda r: r['age'] > resource_lifetime_timedelta, remaining_resources)
+    
+    logger.info('{} resource(s) older than {} hours{}'.format(len(old_resources), resource_lifetime, ':' if old_resources else '.'))
+    dump_resource_list(old_resources)
+    
+    logger.info('Checking whether we have too many resources running (more than our pool size of {})...'.format(pool_size))
+    num_remaining_resources = len(remaining_resources)
+    split_index = num_remaining_resources - pool_size if num_remaining_resources - pool_size > 0 else 0
+    pool_size_casualty_resources = remaining_resources[:split_index] # l[:0] will return an empty list 
+    remaining_resources = remaining_resources[split_index:] # l[0:] will return the complete list
+
+    logger.info('{} additional resource(s) will be removed{}'.format(split_index, ':' if pool_size_casualty_resources else '.'))
+    dump_resource_list(pool_size_casualty_resources)    
+    
+    resources_to_remove = incorrect_salt_configs_version_resources + old_resources + pool_size_casualty_resources
+    logger.info('In total, {} resource(s) will be removed{}'.format(len(resources_to_remove), ':' if resources_to_remove else '.'))
+    dump_resource_list(resources_to_remove)
+    
+    return resources_to_remove
+
+def add_create_aws_resource_jobsteps(cmdr, job_id, num_resources_to_start, ami, cloud_init_script, salt_configs_version, region):
+    logger.info('Adding {} jobStep(s) to create new resource(s)...'.format(num_resources_to_start))
+    
+    for i in range(num_resources_to_start):
+        response = cmdr.createJobStep({
+            'jobStepName': 'Create AWS Resource',
+            'subprocedure': 'Create Build Agent',
+            'actualParameter': [
+                {
+                    'actualParameterName': 'ami',
+                    'value': ami
+                },
+                {
+                    'actualParameterName': 'cloud_init_script',
+                    'value': cloud_init_script
+                },
+                {
+                    'actualParameterName': 'salt_configs_version',
+                    'value': salt_configs_version
+                },
+                {
+                    'actualParameterName': 'region',
+                    'value': region
+                }
+            ],
+            'parallel': '1',
+            'parentPath': '/jobs/{}'.format(job_id)
+        })
+        logger.info('\tnew resource {}: {}'.format(i, response))
+
+def add_create_parallel_break_jobstep(cmdr, job_id):
+    logger.info('Adding a parallel break step...')
+    response = cmdr.createJobStep({
+        'jobStepName': 'Parallel break',
+        'subproject': 'lib - STRATUS',
+        'subprocedure': 'Quietly Sleep',
+        'actualParameter': [{
+            'actualParameterName': 'sleep_hours',
+            'value': '.0001'
+        }],
+        'parentPath': '/jobs/{}'.format(job_id)
+    })
+    logger.info('\t{}'.format(response))
+    
+def add_destroy_aws_resource_jobsteps(cmdr, job_id, resources_to_remove):
+    logger.info('Adding {0} jobStep(s) to remove resource(s)...'.format(len(resources_to_remove)))
+
+    # Hack to get around the property evaluation of EC
+    all_prior_success = '$' + '[/projects/lib - Properties/run_conditions/all_prior_success]'
+    
+    for resource in resources_to_remove:
+        response = cmdr.createJobStep({
+            'jobStepName': 'Destroy AWS Resource - {}'.format(resource['resourceName']),
+            'subprocedure': 'Destroy Build Agent',
+            'actualParameter': [{
+                'actualParameterName': 'resource',
+                'value': resource['resourceName']
+            }],
+            'condition': all_prior_success,
+            'parallel': '1',
+            'parentPath': '/jobs/{}'.format(job_id)
+        })
+        logger.info('\t{}: {}'.format(resource['resourceName'], response))
+
+def release_property_lock(cmdr, job_id):
+    logger.info('Adding release lock jobStep...')
+
+    response = cmdr.createJobStep({
+        'jobStepName': 'Release lock',
+        'subproject': 'lib - Properties',
+        'subprocedure': 'Property Lock :: Release',
+        'actualParameter': [{
+            'actualParameterName': 'lock_property',
+            'value': '/projects/$[/myProject/projectName]/manage_lock'
+        }],
+        'parentPath': '/jobs/{}'.format(job_id)
+    })
+    logger.info(response)
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO, format='%(message)s')
+    
+    cmdr = ec.ElectricCommander()
+
+    pool = 'aws-linux-build'
+    pool_size = int(get_property_value(cmdr, 'pool_size'))
+    resource_lifetime = int(get_property_value(cmdr, 'resource_lifetime'))
+    job_id = get_property_value(cmdr, '/myJob/jobId')
+    
+    ami = get_property_value(cmdr, 'ami')
+    cloud_init_script = get_property_value(cmdr, 'cloud_init_script', expand=False)
+    salt_configs_version = get_property_value(cmdr, 'salt_configs_version')
+    region = get_property_value(cmdr, 'region')
+
+    logger.info('Running Manage AWS pool with:')
+    logger.info('\tami:\t\t\t{}'.format(ami))
+#   logger.info('\tcloud_init_script:\t{}'.format(cloud_init_script))
+    logger.info('\tjob_id:\t\t\t{}'.format(job_id))
+    logger.info('\tpool:\t\t\t{}'.format(pool))
+    logger.info('\tpool_size:\t\t{}'.format(pool_size))
+    logger.info('\tregion:\t\t\t{}'.format(region))
+    logger.info('\tresource_lifetime:\t{} hours'.format(resource_lifetime))
+    logger.info('\tsalt_configs_version:\t{}'.format(salt_configs_version))
+
+    resources = get_resources_in_pool(cmdr, pool)
+    resources_to_remove = determine_resources_to_remove(resources, salt_configs_version, resource_lifetime, pool_size)
+    
+    logger.info('Determining how many resources to start...')
+    # Figure out how many resources we need to start, the difference between the pool size
+    # and the number of resources that will remain after cleaning up the old ones.
+    num_resources_to_start = pool_size - (len(resources) - len(resources_to_remove))
+    logger.info('{} resource(s) should be started.'.format(num_resources_to_start))
+
+    if num_resources_to_start:
+        add_create_aws_resource_jobsteps(cmdr, job_id, num_resources_to_start, ami, cloud_init_script, salt_configs_version, region)
+    
+    # If the number of resources we are starting is the same as our total pool size,
+    # then we need to wait for the new instances to start up before tearing down the
+    # current ones.
+    if pool_size and num_resources_to_start == pool_size and resources_to_remove:
+        add_create_parallel_break_jobstep(cmdr, job_id)
+    
+    if resources_to_remove:
+        add_destroy_aws_resource_jobsteps(cmdr, job_id, resources_to_remove)
+
+    # Add in the property lock release procedure or this all future manage jabs will hang.
+    release_property_lock(cmdr, job_id)
+    

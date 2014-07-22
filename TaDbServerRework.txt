@@ -1,0 +1,95 @@
+
+1. Drop MET01DEV- In progress
+	Instance is down and scheduled for decomm in 1 week
+	Return disk to PATI pool
+
+2. Upgrade TchiTaDb01 
+	Connect 10GbE primary + 1GbE backup to VLAN113 IP = 10.228.113.24. Jumbo frames enabled. 
+	Upgrade OS to OEL 5.9 (currently OEL 5.7)
+	Coordinate downtime with Mike
+
+3. Create new instances on TchiTaDb01:
+	TA02DEV  - TA product dev 
+		   500 GB NFS
+		   16 GB SGA, 2 GB PGA
+		   Archivelog mode w/ logs deleted
+
+	TA02SDEV - TA product smoketest
+		   500 GB NFS
+		   16 GB SGA, 2 GB PGA
+		   Archivelog mode w/ logs deleted
+
+	RDM01DEV - SMO dev/test clone source
+		   move from tchirdcdev01
+		   exist NFS
+		   8 GB SGA, 2 GB PGA
+
+	TAC01DEV - DB Clone target
+		   Requires TNS entry and 100 GB NFS base dir only
+		   16 GB SGA, 2 GB PGA
+
+	TAC02DEV - DB Clone target
+		   Requires TNS entry and 100 GB NFS base dir only
+		   16 GB SGA, 2 GB PGA
+
+
+4. Build-out DB Cloning dev environments
+	Move dev SMO and provisioning DB from RDSMO3D (tchirdcdev01 VM) to TA02DEV
+	Install SMO on TchiTaDb01 
+	Decomm RDSMO3D
+	Create smoketest DB's in TA02SDEV 
+
+5. Migrate TA apps
+	Stratus:
+		Migrate Stratus to 11g using TA02DEV as dev environment
+		Use TA02SDEV for smoketest environment
+	TA Portal:
+		Migrate to Oracle so it can be rehosted on our server?
+		If so, use TA02DEV/TA02SDEV for dev and smoketest environments
+		Delay cutover until TA02PTST is ready
+	Environment website
+		Can it be decomm'ed?
+		
+5. Migrate TA apps off of TchiAutoDb01
+	Temporarily host Stratus prod on TA02SDEV 
+	If env website still needs TA_CLIP@TA1TST, TA_WSM@TA1TST, and TA_WSU@TA1TST move
+		them to TA02SDEV 
+	Decomm TA1TST
+
+6. Upgrade TchiAutoDb01
+	Upgrade OS to OEL 5.9 (currently OEL 5.3)
+	Change main IP address to 10.228 range and add backup 1GbE network link.
+	Connect 1GbE primary + 1GbE backup to VLAN113 IP = 10.228.113.25. Jumbo frames enabled.
+	
+7. Create new instances on TchiAutoDb01
+	TA02UTST - TA product UAT 
+		   250 GB SAN ASM+
+		   16 GB SGA, 2 GB PGA
+		   Archivelog mode w/ logs deleted
+ 
+	TA02PTST - TA product prod 
+		   250 GB SAN ASM+
+		   250 GB SAN/SATA or NAS for DB backup
+		   16 GB SGA, 2 GB PGA
+		   Archivelog mode w/ tape backup
+
+8. TA Apps prod migration
+	Stratus: 
+		Build UAT environment in TA02UTST
+		Move prod environment from TA02SDEV to TA02PTST
+	DB CLoning:
+		Build UAT environment in TA02UTST
+		Move prod environment from RDSMO2T & RDPROV1T (tchirdcdb03) to TA02PTST
+	If TA Portal is being migrated:
+		Build UAT environment in TA02UTST
+		Build prod environment in TA02PTST
+	
+
+9. Misc
+	Drop MET02DEV when Mike finishes with it and return disk to PATI pool
+	Possibly move PCW1BLDT and/or CLIPBLDT from TchiRdcDb03 to TchiTaDb01
+
+
+
+	
+

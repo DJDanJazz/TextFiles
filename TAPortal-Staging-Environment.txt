@@ -1,0 +1,9 @@
+TA Portal
+New Staging Server
+
+Machine:        tauto02
+OS:             Windows Server Enterprise
+Login:          Windows Login Creds
+
+Liferay Server: D:\Liferay\liferay-portal-6.1.0-ce-b4\
+Tomcat Server:  C:\apps\apache-tomcat-7.0.27\

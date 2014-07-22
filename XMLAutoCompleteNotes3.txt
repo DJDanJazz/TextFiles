@@ -1,0 +1,9 @@
+IGNORE_XPATH=.../asdf/Category_Name[3]
+             .../asdf/Category_Name/...
+			 "XPATH///".matches(".*\bELT_NAME$")
+			 
+			 
+			 simplify Xpath upto but excluding the last ordinal
+			 XPATH: /.../.../Category_Name[3]
+			 EXPRESSION: Category_Name[3]
+			 XPATH.endsWith(EXPRESSION)

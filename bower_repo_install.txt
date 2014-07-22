@@ -1,0 +1,9 @@
+cd /tmp
+mkdir dca
+chgrp -R crm dca/
+wget http://nodejs.org/dist/v0.10.29/node-v0.10.29-linux-x64.tar.gz
+tar xzvf node-v0.10.29-linux-x64.tar.gz
+chgrp -R crm node-v0.10.29-linux-x64/
+export PATH=/tools/git/1.9.3/Linux_x86_64/bin:$PATH
+export PATH=/tmp/dca/node-v0.10.29-linux-x64/bin:$PATH
+npm install bower-registry

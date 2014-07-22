@@ -1,0 +1,34 @@
+Given:
+	A: A File containing 2D atoms
+	B: A File containing 2D environment definition
+
+Pseudo-code:
+	Define File A Processing Instructions:
+		User specifies:
+			Open/Close Descriptors:
+				(START/END)
+				(<WORD>/</WORD>)
+				(WORD [/])
+				(WORD:[/])
+			Key/Value Descriptors:
+				(KEY:VALUE)
+				(KEY=VALUE)
+				([KEY][VALUE])
+				(<KEY>WORD</KEY><VALUE>WORD</VALUE>)
+		
+	Open File A.
+	For Each line in File A (A_L):
+		IF OpenWord:
+			Enter word mode
+		IF CloseWord:
+			Exit word mode
+		IF Blank Line:
+			Skip This Line
+		ELSE:
+			It's Data
+			Split Key/Value into 2 parts
+			Store Key/Value into map
+		
+	Open File B.
+	For Each line in File B (B_L):
+		

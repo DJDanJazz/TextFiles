@@ -1,0 +1,38 @@
++------------+
+| Postgresql |
++------------+
+
+cd /opt
+sudo apt-get install curl
+sudo apt-get install vim
+sudo apt-get install build-essential
+sudo apt-get install --reinstall zlibc zlib1g zlib1g-dev
+sudo apt-get upgrade gcc
+sudo wget http://ftp.postgresql.org/pub/source/v9.3.4/postgresql-9.3.4.tar.gz
+sudo tar xzvf postgresql-9.3.4.tar.gz
+cd postgresql-9.3.4
+sudo ./configure --without-readline --prefix=/opt/pgsql
+sudo make
+sudo make install
+cd /opt/pgsql
+sudo mkdir data
+sudo adduser postgres
+sudo chown postgres:postgres /opt/pgsql/data
+su - postgres
+chmod -R 700 /opt/pgsql/data
+/opt/pgsql/bin/initdb -D /opt/pgsql/data/
+
+- To Start Postgres -
+/opt/pgsql/bin/pg_ctl -D /opt/pgsql/data/ -l logfile start
+
+- To Stop Postgres -
+/opt/pgsql/bin/pg_ctl -D /opt/pgsql/data/ stop
+
+- Other Postgres Commands -
+/opt/pgsql/bin/pg_ctl start
+/opt/pgsql/bin/pg_ctl stop
+/opt/pgsql/bin/pg_ctl restart
+/opt/pgsql/bin/pg_ctl reload
+/opt/pgsql/bin/pg_ctl status
+/opt/pgsql/bin/pg_ctl promote
+/opt/pgsql/bin/pg_ctl kill

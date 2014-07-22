@@ -1,0 +1,11 @@
+Day	Ceremony
+1>	Sprint Planning (1hr)
+2>	
+3>	
+4>	Product Backlog Grooming - First Round (1 hr)
+5>	
+6>	
+7>	Product Backlog Grooming - Second Round (1 hr)
+8>	Story Tasking & Sizing (1hr)
+9>	
+10>	Retrospective/Demo
